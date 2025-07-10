@@ -15,7 +15,7 @@ import FriendCard, { getLanguageFlag } from "../components/FriendCard";
 import NoFriendsFound from "../components/NoFriendsFound";
 
 // 🟢 import the chatbot
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatBot";
 
 const HomePage = () => {
   const queryClient = useQueryClient();

@@ -2,17 +2,39 @@ import { axiosInstance } from "./axios";
 
 export const signup = async (signupData) => {
   const response = await axiosInstance.post("/auth/signup", signupData);
+  
+  // Store token if provided
+  if (response.data.token) {
+    localStorage.setItem('authToken', response.data.token);
+  }
+  
   return response.data;
 };
 
 export const login = async (loginData) => {
   const response = await axiosInstance.post("/auth/login", loginData);
+  
+  // Store token if provided
+  if (response.data.token) {
+    localStorage.setItem('authToken', response.data.token);
+  }
+  
   return response.data;
 };
 
 export const logout = async () => {
-  const response = await axiosInstance.post("/auth/logout");
-  return response.data;
+  try {
+    const response = await axiosInstance.post("/auth/logout");
+    
+    // Clear token from localStorage
+    localStorage.removeItem('authToken');
+    
+    return response.data;
+  } catch (error) {
+    // Even if logout fails on server, clear local token
+    localStorage.removeItem('authToken');
+    throw error;
+  }
 };
 
 export const getAuthUser = async () => {
@@ -21,6 +43,12 @@ export const getAuthUser = async () => {
     return res.data;
   } catch (error) {
     console.log("Error in getAuthUser:", error);
+    
+    // If unauthorized, clear token
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+    }
+    
     return null;
   }
 };
@@ -74,6 +102,16 @@ export const createPaymentOrder = async (amount, currency = "INR") => {
 export const verifyPayment = async (paymentData) => {
   const response = await axiosInstance.post("/payment/verify", paymentData);
   return response.data;
+};
+
+// Utility function to check if user is authenticated
+export const isAuthenticated = () => {
+  return !!localStorage.getItem('authToken');
+};
+
+// Utility function to get token
+export const getToken = () => {
+  return localStorage.getItem('authToken');
 };
 
 // Alias for consistency with existing code
